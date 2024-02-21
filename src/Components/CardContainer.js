@@ -1,20 +1,25 @@
 import React from "react";
 import PlaceCard from "./PlaceCard";
 import { Scrollbars } from "rc-scrollbars";
-import { Row } from "antd";
+import { Row, Col } from "antd";
 const CardContainer = ({ places }) => {
   return (
     // Sorting and filters stuff
-    <div style={{ height: "90vh", width: "100%" }} className="card-container">
-      <Scrollbars autoHide>
-        <Row justify="center" align="middle" style={{ height: "100%" }}>
-          {places &&
-            places.map((place) => {
-              return <PlaceCard key={place.place_id} place={place} />;
-            })}
-        </Row>
-      </Scrollbars>
-    </div>
+    <Row justify="center" align="middle" style={{ height: "100%" }}>
+      <Col xs={24} sm={24} md={18} lg={16}>
+        <div
+          style={{ height: "90vh", width: "100%" }}
+          className="card-container"
+        >
+          <Scrollbars autoHide>
+            {places &&
+              places.map((place) => {
+                return <PlaceCard key={place.place_id} place={place} />;
+              })}
+          </Scrollbars>
+        </div>
+      </Col>
+    </Row>
   );
 };
 

@@ -1,20 +1,17 @@
 import React from "react";
 import { Card } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
-import { Col } from "antd";
 const { Meta } = Card;
 
 const PlaceCard = ({ place }) => {
   return (
-    <Col xs={24} sm={24} md={18} lg={16} style={{ marginTop: "1rem" }}>
-      <Card
-        style={{ width: "100%" }}
-        //   cover={<img alt="example" src={place.photos[0].getUrl()} />}
-        actions={[<EllipsisOutlined key="ellipsis" />]}
-      >
-        <Meta title={place.name} description="This is the description" />
-      </Card>
-    </Col>
+    <Card
+      style={{ width: "100%", marginTop: "1rem" }}
+      //   cover={<img alt="example" src={place.photos[0].getUrl()} />}
+      actions={[<EllipsisOutlined key="ellipsis" />]}
+    >
+      <Meta title={place.name} description="This is the description" />
+    </Card>
   );
 };
 // {
