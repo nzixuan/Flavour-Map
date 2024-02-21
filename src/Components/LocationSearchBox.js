@@ -7,7 +7,8 @@ function LocationSearchBox({
   searchBox,
   setSearchBox,
   map,
-  setCenterMarker,
+  mapSettings,
+  setMapSettings,
   setPlaces,
 }) {
   const onPlacesChanged = () => {
@@ -29,10 +30,10 @@ function LocationSearchBox({
       } else {
         map.setCenter(places[0].geometry.location);
       }
-      setCenterMarker(places[0]);
+      setMapSettings({ ...mapSettings, centerMarker: places[0] });
       setPlaces(null);
     } else {
-      setCenterMarker(null);
+      setMapSettings({ ...mapSettings, centerMarker: null });
       const bounds = new window.google.maps.LatLngBounds();
       for (let i = 0; i < places.length; i++) {
         if (places[i].geometry.viewport) {
@@ -46,9 +47,12 @@ function LocationSearchBox({
     }
   };
 
-  const onLoad = React.useCallback(function callback(searchBox) {
-    setSearchBox(searchBox);
-  }, []);
+  const onLoad = React.useCallback(
+    function callback(searchBox) {
+      setSearchBox(searchBox);
+    },
+    [setSearchBox]
+  );
   return (
     map && (
       <StandaloneSearchBox

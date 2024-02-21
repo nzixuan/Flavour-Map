@@ -5,13 +5,7 @@ import { InfoWindow } from "@react-google-maps/api";
 import React from "react";
 import { defaultCenter } from "../constants";
 
-function Map({
-  setMap,
-  centerMarker,
-  places,
-  selectedPlace,
-  setSelectedPlace,
-}) {
+function Map({ setMap, mapSettings, places, selectedPlace, setSelectedPlace }) {
   const [mapContainerStyle, setMapContainerStyle] = useState({
     width: "80vw",
     height: "80vw", // Default values for mobile
@@ -39,13 +33,19 @@ function Map({
     };
   }, []);
 
-  const onLoad = React.useCallback(function callback(map) {
-    setMap(map);
-  }, []);
+  const onLoad = React.useCallback(
+    function callback(map) {
+      setMap(map);
+    },
+    [setMap]
+  );
 
-  const onUnmount = React.useCallback(function callback(map) {
-    setMap(null);
-  }, []);
+  const onUnmount = React.useCallback(
+    function callback(map) {
+      setMap(null);
+    },
+    [setMap]
+  );
 
   function createKey(location) {
     const roundedLat = location.lat().toFixed(5);
@@ -62,7 +62,9 @@ function Map({
       onUnmount={onUnmount}
     >
       {/* Center Marker */}
-      {centerMarker && <Marker position={centerMarker.geometry.location} />}
+      {mapSettings.centerMarker && (
+        <Marker position={mapSettings.centerMarker.geometry.location} />
+      )}
 
       {/* Places Markers */}
       {places &&
