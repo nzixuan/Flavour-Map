@@ -17,7 +17,7 @@ function Map({ setMap, mapSettings, places, selectedPlace, setSelectedPlace }) {
         // Adjust the breakpoint for desktop as needed
         setMapContainerStyle({
           width: "70vw",
-          height: "50vh", // Values for desktop
+          height: "40vh", // Values for desktop
         });
       } else {
         setMapContainerStyle({
@@ -47,12 +47,6 @@ function Map({ setMap, mapSettings, places, selectedPlace, setSelectedPlace }) {
     [setMap]
   );
 
-  function createKey(location) {
-    const roundedLat = location.lat().toFixed(5);
-    const roundedLng = location.lng().toFixed(5);
-    const key = `${roundedLat}_${roundedLng}`;
-    return key;
-  }
   return (
     <GoogleMap
       mapContainerStyle={mapContainerStyle}
@@ -70,7 +64,7 @@ function Map({ setMap, mapSettings, places, selectedPlace, setSelectedPlace }) {
       {places &&
         places.map((place) => (
           <Marker
-            key={createKey(place.geometry.location)}
+            key={place.place_id}
             position={place.geometry.location}
             onClick={(e) => {
               setSelectedPlace(place);

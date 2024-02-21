@@ -31,14 +31,13 @@ function App() {
     if (mapSettings.centerMarker !== null) {
       placesService.nearbySearch(
         {
+          keyword: "food",
           location: mapSettings.centerMarker.geometry.location,
           radius: 1500,
-          type: "restaurant",
           key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
         },
         (results, status) => {
           if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-            console.log(results);
             setPlaces(results);
           } else {
             console.error(status);
@@ -80,6 +79,7 @@ function App() {
         </Flex>
         {/* </div> */}
         <CardContainer
+          map={map}
           places={places}
           selectedPlace={selectedPlace}
         ></CardContainer>

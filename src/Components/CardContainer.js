@@ -2,7 +2,7 @@ import React from "react";
 import PlaceCard from "./PlaceCard";
 import { Scrollbars } from "rc-scrollbars";
 import { Row, Col } from "antd";
-const CardContainer = ({ places }) => {
+const CardContainer = ({ map, places }) => {
   return (
     // Sorting and filters stuff
     <Row justify="center" align="middle" style={{ height: "100%" }}>
@@ -14,7 +14,9 @@ const CardContainer = ({ places }) => {
           <Scrollbars autoHide>
             {places &&
               places.map((place) => {
-                return <PlaceCard key={place.place_id} place={place} />;
+                return (
+                  <PlaceCard map={map} key={place.place_id} place={place} />
+                );
               })}
           </Scrollbars>
         </div>

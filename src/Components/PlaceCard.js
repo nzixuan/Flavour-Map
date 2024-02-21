@@ -1,19 +1,94 @@
+import "./PlaceCard.css";
 import React from "react";
-import { Card } from "antd";
+import { Image, Card, Row, Col } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
+import ImageCollage from "./ImageCollage";
 const { Meta } = Card;
 
-const PlaceCard = ({ place }) => {
+const PlaceCard = ({ map, place }) => {
   return (
     <Card
-      style={{ width: "100%", marginTop: "1rem" }}
-      //   cover={<img alt="example" src={place.photos[0].getUrl()} />}
-      actions={[<EllipsisOutlined key="ellipsis" />]}
+      style={{ width: "100%", marginTop: "0.5rem" }}
+      // actions={[<EllipsisOutlined key="ellipsis" />]}
     >
-      <Meta title={place.name} description="This is the description" />
+      <Row justify="space-between">
+        <Col xs={10} md={8}>
+          <Row justify="center">
+            <div
+              style={{
+                height: "15rem",
+                overflow: "hidden",
+              }}
+            >
+              <Image
+                alt={place.name}
+                style={{
+                  height: "15rem",
+                  objectFit: "cover",
+                  borderRadius: "5px",
+                }}
+                src={
+                  place?.photos?.length > 0
+                    ? place?.photos[0].getUrl()
+                    : "./placeholder.png"
+                }
+                preview={
+                  place?.photos?.length > 0
+                    ? {
+                        imageRender: () => {
+                          return (
+                            <div
+                              style={{
+                                width: "80vw",
+                                height: "80vh",
+                              }}
+                            >
+                              <ImageCollage map={map} id={place.place_id} />
+                            </div>
+                          );
+                        },
+                        toolbarRender: () => null,
+                      }
+                    : false
+                }
+              />
+            </div>
+          </Row>
+        </Col>
+        <Col xs={13} md={15}>
+          <Meta
+            style={{ paddingTop: "1rem" }}
+            title={place.name}
+            description="This is the description"
+          />
+        </Col>
+        {/* <Col span={2}>
+          <EllipsisOutlined key="ellipsis" />
+        </Col> */}
+      </Row>
+      {/* <ImageCollage map={map} id={place.place_id} /> */}
     </Card>
   );
 };
+
+//     "formatted_address": "#02-171 Queen's Rd, Blk 3 Block 3, Singapore 260003",
+//     "business_status": "OPERATIONAL",
+//     "name": "Food R Us",
+//     "opening_hours": {
+//         "open_now": true
+//     },
+//     "price_level": 2,
+//     "rating": 4.2,
+//     "types": [
+//         "restaurant",
+//         "food",
+//         "point_of_interest",
+//         "establishment"
+//     ],
+
+//     "user_ratings_total": 543,
+//     "place_id": "ChIJIQeGbAYa2jERrPcqCPAHZcc",
+//     "reference": "ChIJIQeGbAYa2jERrPcqCPAHZcc",
 // {
 //     "business_status": "OPERATIONAL",
 //     "formatted_address": "#02-171 Queen's Rd, Blk 3 Block 3, Singapore 260003",
