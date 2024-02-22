@@ -56,11 +56,12 @@ const PlaceCard = ({ map, place }) => {
           </Row>
         </Col>
         <Col xs={13} md={15}>
-          <Meta
-            style={{ paddingTop: "1rem" }}
-            title={place.name}
-            description="This is the description"
-          />
+          <Meta style={{ paddingTop: "1rem" }} title={place.name} />
+          <p>{place.formatted_address}</p>
+          <p>Rating: {place.rating}</p>
+          <p>{place.user_ratings_total}</p>
+          <p>{place.price_level}</p>
+          <p>{place.types.join(", ")}</p>
         </Col>
         {/* <Col span={2}>
           <EllipsisOutlined key="ellipsis" />

@@ -18,10 +18,16 @@ function App() {
   });
 
   const [map, setMap] = React.useState(null);
-  const [places, setPlaces] = React.useState(null);
+  const [places, setPlaces] = React.useState([]);
   const [searchBox, setSearchBox] = React.useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [mapSettings, setMapSettings] = useState({ centerMarker: null });
+
+  const placeScore = (place) => {
+    return place && place.rating && place.user_ratings_total
+      ? (place.rating * Math.log(place.user_ratings_total + 1)) / Math.log(6)
+      : 0;
+  };
 
   useEffect(() => {
     if (map === null) {
@@ -31,14 +37,35 @@ function App() {
     if (mapSettings.centerMarker !== null) {
       placesService.nearbySearch(
         {
-          keyword: "food",
+          rankBy: window.google.maps.places.RankBy.PROMINENCE,
+          // keyword: "food",
+          type: "restaurant",
+
           location: mapSettings.centerMarker.geometry.location,
-          radius: 1500,
+          radius: 500,
           key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
         },
-        (results, status) => {
+        (results, status, pagination) => {
           if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-            setPlaces(results);
+            setPlaces((prevPlaces) => {
+              if (
+                pagination.hasNextPage &&
+                (!prevPlaces || prevPlaces.length < 100)
+              ) {
+                pagination.nextPage();
+              }
+
+              const updatePlace = [...(prevPlaces || []), ...results]
+                .filter((place) => place.business_status === "OPERATIONAL")
+                .map((place) => {
+                  return {
+                    ...place,
+                    score: placeScore(place),
+                  };
+                });
+              updatePlace.sort((a, b) => b.score - a.score);
+              return updatePlace;
+            });
           } else {
             console.error(status);
           }
@@ -46,6 +73,9 @@ function App() {
       );
     }
   }, [map, mapSettings]);
+  console.log(places?.length);
+  console.log(places?.map((place) => place.name + " " + place.place_id));
+  console.log(places);
 
   return isLoaded ? (
     <Layout style={{ minHeight: "100vh" }}>

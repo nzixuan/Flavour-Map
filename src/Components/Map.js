@@ -64,7 +64,7 @@ function Map({ setMap, mapSettings, places, selectedPlace, setSelectedPlace }) {
       {places &&
         places.map((place) => (
           <Marker
-            key={place.place_id}
+            key={place.place_id + "m"}
             position={place.geometry.location}
             onClick={(e) => {
               setSelectedPlace(place);
