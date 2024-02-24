@@ -7,4 +7,4 @@ export const defaultBounds = {
   west: 103.605,
 };
 
-export const NUM_CARD_DISPLAYED = 6;
+export const NUM_CARD_DISPLAYED = 3;

@@ -6,67 +6,78 @@ import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
 import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
-import Scrollbars from "rc-scrollbars";
-const ImageCollage = ({ map, id }) => {
+const ImageCollage = ({ map, place, savedPlaces, setSavedPlaces }) => {
   const [images, setImages] = useState([]);
   const [index, setIndex] = useState(-1);
 
   useEffect(() => {
-    if (id && map && images) {
-      //TODO: Backend to Save and Retrieve Images
-      const placesService = new window.google.maps.places.PlacesService(map);
-      placesService.getDetails(
-        {
-          placeId: id,
-          fields: ["photos"],
-        },
-        (place, status) => {
-          console.log("API Called");
-          if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-            setImages(
-              //TODO: TEMPORARY MEASURE FOR IMAGES
-              place?.photos?.slice(0, 3).map((photo) => {
-                return {
-                  src: photo.getUrl(),
-                  width: photo.width,
-                  height: photo.height,
-                };
-              })
-            );
-          }
-        }
-      );
-    }
-  }, [id, map]);
+    if (place && map && images.length === 0) {
+      if (place?.photos?.length > 0) {
+        const matchingPlace = savedPlaces?.find(
+          (savedPlace) => savedPlace.place_id === place?.place_id
+        );
+        if (matchingPlace) {
+          return matchingPlace.savedPhotos;
+        } else {
+          console.log("Getting new photo");
 
+          const placesService = new window.google.maps.places.PlacesService(
+            map
+          );
+          placesService.getDetails(
+            {
+              placeId: place.place_id,
+              fields: ["photos"],
+            },
+            (p, status) => {
+              console.log("Photo API Called");
+              if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+                const images = p?.photos
+                  ?.slice(0, Math.min(3, p?.photos?.length))
+                  .map((photo) => {
+                    return {
+                      src: photo.getUrl(),
+                      width: photo.width,
+                      height: photo.height,
+                    };
+                  });
+                setSavedPlaces((prev) => [
+                  ...savedPlaces,
+                  { place_id: place.place_id, savedPhotos: images },
+                ]);
+                setImages(images);
+              }
+            }
+          );
+        }
+      }
+      setImages([{ src: "./placeholder.png" }]);
+    }
+  }, [place, map]);
   return images && images.length > 0 ? (
     <div
       style={{
         width: "100%",
-        height: "100%",
+        height: "auto",
       }}
     >
-      <Scrollbars autoHide>
-        <PhotoAlbum
-          layout="rows"
-          targetRowHeight={300}
-          columns={(containerWidth) => {
-            if (containerWidth < 400) return 2;
-            if (containerWidth < 800) return 3;
-            if (containerWidth < 1000) return 4;
-            return 5;
-          }}
-          photos={images}
-          onClick={({ index }) => setIndex(index)}
-        />
-        <Lightbox
-          slides={images}
-          open={index >= 0}
-          index={index}
-          close={() => setIndex(-1)}
-          plugins={[Fullscreen, Thumbnails, Zoom]}
-        />
-      </Scrollbars>
+      <PhotoAlbum
+        // layout="rows"
+        layout="columns"
+        columns={(containerWidth) => {
+          if (containerWidth < 500) return 2;
+          return 3;
+        }}
+        photos={images}
+        onClick={({ index }) => setIndex(index)}
+      />
+      <Lightbox
+        slides={images}
+        open={index >= 0}
+        index={index}
+        close={() => setIndex(-1)}
+        plugins={[Fullscreen, Thumbnails, Zoom]}
+      />
     </div>
   ) : (
     <div></div>

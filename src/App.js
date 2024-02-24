@@ -23,6 +23,7 @@ function App() {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [mapSettings, setMapSettings] = useState({ centerMarker: null });
   const [placesLoading, setPlacesLoading] = useState(false);
+  const [displayedPlaces, setDisplayedPlaces] = useState([]);
 
   const placeScore = (place) => {
     return place && place.rating && place.user_ratings_total
@@ -48,7 +49,7 @@ function App() {
           key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
         },
         (results, status, pagination) => {
-          console.log("API Called");
+          console.log("Nearby search API Called");
           if (status === window.google.maps.places.PlacesServiceStatus.OK) {
             setPlaces((prevPlaces) => {
               if (
@@ -104,7 +105,7 @@ function App() {
             map={map}
             setMap={setMap}
             mapSettings={mapSettings}
-            places={places}
+            places={displayedPlaces}
             selectedPlace={selectedPlace}
             setSelectedPlace={setSelectedPlace}
           ></Map>
@@ -115,9 +116,11 @@ function App() {
           places={places}
           selectedPlace={selectedPlace}
           placesLoading={placesLoading}
+          displayedPlaces={displayedPlaces}
+          setDisplayedPlaces={setDisplayedPlaces}
         ></CardContainer>
       </Content>
-      {/* <Footer>Created By Ng Zi Xuan</Footer> */}
+      <Footer>Created By Ng Zi Xuan</Footer>
     </Layout>
   ) : (
     <div>

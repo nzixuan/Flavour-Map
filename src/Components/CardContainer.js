@@ -3,8 +3,13 @@ import PlaceCard from "./PlaceCard";
 import { Row, Col } from "antd";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { NUM_CARD_DISPLAYED } from "../constants";
-const CardContainer = ({ map, places, placesLoading }) => {
-  const [displayedPlaces, setDisplayedPlaces] = useState([]);
+const CardContainer = ({
+  map,
+  places,
+  placesLoading,
+  displayedPlaces,
+  setDisplayedPlaces,
+}) => {
   const [savedPlaces, setSavedPlaces] = useState([]);
 
   useEffect(() => {
