@@ -22,6 +22,7 @@ function App() {
   const [searchBox, setSearchBox] = React.useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [mapSettings, setMapSettings] = useState({ centerMarker: null });
+  const [placesLoading, setPlacesLoading] = useState(false);
 
   const placeScore = (place) => {
     return place && place.rating && place.user_ratings_total
@@ -35,6 +36,7 @@ function App() {
     }
     const placesService = new window.google.maps.places.PlacesService(map);
     if (mapSettings.centerMarker !== null) {
+      setPlacesLoading(true);
       placesService.nearbySearch(
         {
           rankBy: window.google.maps.places.RankBy.PROMINENCE,
@@ -42,17 +44,20 @@ function App() {
           type: "restaurant",
 
           location: mapSettings.centerMarker.geometry.location,
-          radius: 500,
+          radius: 100,
           key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
         },
         (results, status, pagination) => {
+          console.log("API Called");
           if (status === window.google.maps.places.PlacesServiceStatus.OK) {
             setPlaces((prevPlaces) => {
               if (
                 pagination.hasNextPage &&
-                (!prevPlaces || prevPlaces.length < 100)
+                (!prevPlaces || prevPlaces.length < 10)
               ) {
                 pagination.nextPage();
+              } else {
+                setPlacesLoading(false);
               }
 
               const updatePlace = [...(prevPlaces || []), ...results]
@@ -73,9 +78,6 @@ function App() {
       );
     }
   }, [map, mapSettings]);
-  console.log(places?.length);
-  console.log(places?.map((place) => place.name + " " + place.place_id));
-  console.log(places);
 
   return isLoaded ? (
     <Layout style={{ minHeight: "100vh" }}>
@@ -112,9 +114,10 @@ function App() {
           map={map}
           places={places}
           selectedPlace={selectedPlace}
+          placesLoading={placesLoading}
         ></CardContainer>
       </Content>
-      <Footer>Created By Ng Zi Xuan</Footer>
+      {/* <Footer>Created By Ng Zi Xuan</Footer> */}
     </Layout>
   ) : (
     <div>

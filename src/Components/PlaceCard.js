@@ -4,13 +4,43 @@ import { Image, Card, Row, Col } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import ImageCollage from "./ImageCollage";
 const { Meta } = Card;
+function convertPriceLevel(priceLevel) {
+  const dollarSign = "$";
+  if (priceLevel) return dollarSign.repeat(priceLevel);
+  return "";
+}
 
-const PlaceCard = ({ map, place }) => {
+const PlaceCard = ({ map, place, savedPlaces, setSavedPlaces }) => {
+  const getImageUrl = () => {
+    if (place?.photos?.length > 0) {
+      const matchingPlace = savedPlaces?.find(
+        (savedPlace) => savedPlace.place_id === place?.place_id
+      );
+
+      if (matchingPlace) {
+        return matchingPlace.savedPhoto;
+      } else {
+        console.log("Getting new photo");
+        const photo = place?.photos[0].getUrl();
+        setSavedPlaces((prev) => [
+          { place_id: place.place_id, savedPhoto: photo },
+          ...prev,
+        ]);
+        return place?.photos[0].getUrl();
+      }
+    }
+    return "./placeholder.png";
+  };
+  console.log(savedPlaces);
   return (
     <Card
       style={{ width: "100%", marginTop: "0.5rem" }}
       // actions={[<EllipsisOutlined key="ellipsis" />]}
     >
+      {/* <Row>
+        <ImageCollage map={map} id={place.place_id} savedPhoto />
+
+      </Row> */}
       <Row justify="space-between">
         <Col xs={10} md={8}>
           <Row justify="center">
@@ -29,39 +59,51 @@ const PlaceCard = ({ map, place }) => {
                 }}
                 src={
                   place?.photos?.length > 0
-                    ? place?.photos[0].getUrl()
+                    ? getImageUrl()
                     : "./placeholder.png"
                 }
-                preview={
-                  place?.photos?.length > 0
-                    ? {
-                        imageRender: () => {
-                          return (
-                            <div
-                              style={{
-                                width: "80vw",
-                                height: "80vh",
-                              }}
-                            >
-                              <ImageCollage map={map} id={place.place_id} />
-                            </div>
-                          );
-                        },
-                        toolbarRender: () => null,
-                      }
-                    : false
-                }
+
+                // {/* // TODO: FIX to allow Images .*/}
+                //   preview={
+                //     place?.photos?.length > 0
+                //       ? {
+                //           imageRender: () => {
+                //             return (
+                //               <div
+                //                 style={{
+                //                   width: "80vw",
+                //                   height: "80vh",
+                //                 }}
+                //               >
+                //                 <ImageCollage map={map} id={place.place_id} />
+                //               </div>
+                //             );
+                //           },
+                //           toolbarRender: () => null,
+                //         }
+                //       : false
+                //   }
               />
             </div>
           </Row>
         </Col>
         <Col xs={13} md={15}>
           <Meta style={{ paddingTop: "1rem" }} title={place.name} />
-          <p>{place.formatted_address}</p>
+          <p>{place.formatted_address || place.vicinity}</p>
           <p>Rating: {place.rating}</p>
           <p>{place.user_ratings_total}</p>
-          <p>{place.price_level}</p>
+          <p>{convertPriceLevel(place.price_level)}</p>
           <p>{place.types.join(", ")}</p>
+          <a
+            href={
+              "https://www.google.com/maps/search/?api=1&query=" +
+              place.name +
+              "&query_place_id=" +
+              place.place_id
+            }
+          >
+            Link to Gmaps
+          </a>
         </Col>
         {/* <Col span={2}>
           <EllipsisOutlined key="ellipsis" />

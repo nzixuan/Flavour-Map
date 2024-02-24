@@ -13,6 +13,7 @@ const ImageCollage = ({ map, id }) => {
 
   useEffect(() => {
     if (id && map && images) {
+      //TODO: Backend to Save and Retrieve Images
       const placesService = new window.google.maps.places.PlacesService(map);
       placesService.getDetails(
         {
@@ -20,9 +21,11 @@ const ImageCollage = ({ map, id }) => {
           fields: ["photos"],
         },
         (place, status) => {
+          console.log("API Called");
           if (status === window.google.maps.places.PlacesServiceStatus.OK) {
             setImages(
-              place?.photos?.map((photo) => {
+              //TODO: TEMPORARY MEASURE FOR IMAGES
+              place?.photos?.slice(0, 3).map((photo) => {
                 return {
                   src: photo.getUrl(),
                   width: photo.width,
@@ -46,8 +49,6 @@ const ImageCollage = ({ map, id }) => {
       <Scrollbars autoHide>
         <PhotoAlbum
           layout="rows"
-          // layout="masonry"
-          // layout="columsns"
           targetRowHeight={300}
           columns={(containerWidth) => {
             if (containerWidth < 400) return 2;
