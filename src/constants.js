@@ -6,3 +6,5 @@ export const defaultBounds = {
   south: 1.1305,
   west: 103.605,
 };
+
+export const NUM_CARD_DISPLAYED = 3;

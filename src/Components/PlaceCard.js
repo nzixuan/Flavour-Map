@@ -4,64 +4,48 @@ import { Image, Card, Row, Col } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import ImageCollage from "./ImageCollage";
 const { Meta } = Card;
+function convertPriceLevel(priceLevel) {
+  const dollarSign = "$";
+  if (priceLevel) return dollarSign.repeat(priceLevel);
+  return "";
+}
 
-const PlaceCard = ({ map, place }) => {
+const PlaceCard = ({ map, place, savedPlaces, setSavedPlaces }) => {
   return (
     <Card
       style={{ width: "100%", marginTop: "0.5rem" }}
       // actions={[<EllipsisOutlined key="ellipsis" />]}
     >
+      <Row>
+        <ImageCollage
+          map={map}
+          place={place}
+          savedPlaces={savedPlaces}
+          setSavedPlaces={setSavedPlaces}
+        />
+      </Row>
       <Row justify="space-between">
-        <Col xs={10} md={8}>
+        {/* <Col xs={10} md={8}>
           <Row justify="center">
-            <div
-              style={{
-                height: "15rem",
-                overflow: "hidden",
-              }}
-            >
-              <Image
-                alt={place.name}
-                style={{
-                  height: "15rem",
-                  objectFit: "cover",
-                  borderRadius: "5px",
-                }}
-                src={
-                  place?.photos?.length > 0
-                    ? place?.photos[0].getUrl()
-                    : "./placeholder.png"
-                }
-                preview={
-                  place?.photos?.length > 0
-                    ? {
-                        imageRender: () => {
-                          return (
-                            <div
-                              style={{
-                                width: "80vw",
-                                height: "80vh",
-                              }}
-                            >
-                              <ImageCollage map={map} id={place.place_id} />
-                            </div>
-                          );
-                        },
-                        toolbarRender: () => null,
-                      }
-                    : false
-                }
-              />
-            </div>
           </Row>
-        </Col>
+        </Col> */}
         <Col xs={13} md={15}>
           <Meta style={{ paddingTop: "1rem" }} title={place.name} />
-          <p>{place.formatted_address}</p>
+          <p>{place.formatted_address || place.vicinity}</p>
           <p>Rating: {place.rating}</p>
           <p>{place.user_ratings_total}</p>
-          <p>{place.price_level}</p>
+          <p>{convertPriceLevel(place.price_level)}</p>
           <p>{place.types.join(", ")}</p>
+          <a
+            href={
+              "https://www.google.com/maps/search/?api=1&query=" +
+              place.name +
+              "&query_place_id=" +
+              place.place_id
+            }
+          >
+            Link to Gmaps
+          </a>
         </Col>
         {/* <Col span={2}>
           <EllipsisOutlined key="ellipsis" />
