@@ -1,7 +1,7 @@
 import "./App.css";
 
 import { Content, Footer, Header } from "antd/es/layout/layout";
-import { Flex, Layout } from "antd";
+import { Flex, Layout, Slider } from "antd";
 import { GOOGLE_MAPS_LIBRARIES } from "./constants";
 import LocationSearchBox from "./Components/LocationSearchBox";
 import Map from "./Components/Map";
@@ -9,7 +9,7 @@ import React, { useEffect } from "react";
 import { useJsApiLoader } from "@react-google-maps/api";
 import { useState } from "react";
 import CardContainer from "./Components/CardContainer";
-
+import MenuDropdown from "./Components/MenuDropdown";
 function App() {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -21,7 +21,11 @@ function App() {
   const [places, setPlaces] = React.useState([]);
   const [searchBox, setSearchBox] = React.useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
-  const [mapSettings, setMapSettings] = useState({ centerMarker: null });
+  const [mapSettings, setMapSettings] = useState({
+    centerMarkerLatLng: null,
+    radius: 1000,
+    foodType: "restaurant",
+  });
   const [placesLoading, setPlacesLoading] = useState(false);
   const [displayedPlaces, setDisplayedPlaces] = useState([]);
 
@@ -36,16 +40,18 @@ function App() {
       return;
     }
     const placesService = new window.google.maps.places.PlacesService(map);
-    if (mapSettings.centerMarker !== null) {
+    if (mapSettings.centerMarkerLatLng !== null) {
       setPlacesLoading(true);
+      setPlaces([]);
+      setDisplayedPlaces([]);
+      console.log(mapSettings.centerMarkerLatLng);
       placesService.nearbySearch(
         {
           rankBy: window.google.maps.places.RankBy.PROMINENCE,
           // keyword: "food",
-          type: "restaurant",
-
-          location: mapSettings.centerMarker.geometry.location,
-          radius: 100,
+          type: mapSettings.foodType,
+          location: mapSettings.centerMarkerLatLng,
+          radius: mapSettings.radius,
           key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
         },
         (results, status, pagination) => {
@@ -79,7 +85,7 @@ function App() {
       );
     }
   }, [map, mapSettings]);
-
+  console.log(mapSettings.radius);
   return isLoaded ? (
     <Layout style={{ minHeight: "100vh" }}>
       <Header
@@ -97,6 +103,20 @@ function App() {
           setMapSettings={setMapSettings}
           setPlaces={setPlaces}
         ></LocationSearchBox>
+        <Slider
+          min={1000}
+          max={10000}
+          step={1000}
+          value={mapSettings.radius}
+          onChange={(value) => {
+            setMapSettings({ ...mapSettings, radius: value });
+          }}
+          style={{ width: "200px", margin: "0 20px" }}
+        ></Slider>
+        <MenuDropdown
+          mapSettings={mapSettings}
+          setMapSettings={setMapSettings}
+        />
       </Header>
       <Content style={{ overflow: "auto" }}>
         {/* <div style={{ position: "sticky", top: "0", zIndex: 100 }}> */}
@@ -105,6 +125,7 @@ function App() {
             map={map}
             setMap={setMap}
             mapSettings={mapSettings}
+            setMapSettings={setMapSettings}
             places={displayedPlaces}
             selectedPlace={selectedPlace}
             setSelectedPlace={setSelectedPlace}
