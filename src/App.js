@@ -1,7 +1,7 @@
 import "./App.css";
 
 import { Content, Footer, Header } from "antd/es/layout/layout";
-import { Flex, Layout, Slider } from "antd";
+import { Flex, Layout, Slider, Button } from "antd";
 import { GOOGLE_MAPS_LIBRARIES } from "./constants";
 import LocationSearchBox from "./Components/LocationSearchBox";
 import Map from "./Components/Map";
@@ -34,8 +34,7 @@ function App() {
       ? (place.rating * Math.log(place.user_ratings_total + 1)) / Math.log(6)
       : 0;
   };
-
-  useEffect(() => {
+  const search = () => {
     if (map === null) {
       return;
     }
@@ -84,7 +83,7 @@ function App() {
         }
       );
     }
-  }, [map, mapSettings]);
+  };
   console.log(mapSettings.radius);
   return isLoaded ? (
     <Layout style={{ minHeight: "100vh" }}>
@@ -105,7 +104,7 @@ function App() {
         ></LocationSearchBox>
         <Slider
           min={1000}
-          max={10000}
+          max={8000}
           step={1000}
           value={mapSettings.radius}
           onChange={(value) => {
@@ -117,6 +116,7 @@ function App() {
           mapSettings={mapSettings}
           setMapSettings={setMapSettings}
         />
+        <Button onClick={search}>Search</Button>
       </Header>
       <Content style={{ overflow: "auto" }}>
         {/* <div style={{ position: "sticky", top: "0", zIndex: 100 }}> */}

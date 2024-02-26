@@ -27,7 +27,7 @@ function MenuDropdown({ mapSettings, setMapSettings }) {
     <div style={{ margin: "20px" }}>
       <Dropdown overlay={menu} placement="bottomLeft">
         <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
-          click here <i className="fa fa-caret-down"></i>
+          FoodTypes <i className="fa fa-caret-down"></i>
         </a>
       </Dropdown>
     </div>
