@@ -30,10 +30,16 @@ function LocationSearchBox({
       } else {
         map.setCenter(places[0].geometry.location);
       }
-      setMapSettings({ ...mapSettings, centerMarker: places[0] });
+      setMapSettings({
+        ...mapSettings,
+        centerMarkerLatLng: {
+          lat: places[0].geometry.location.lat(),
+          lng: places[0].geometry.location.lng(),
+        },
+      });
       setPlaces(null);
     } else {
-      setMapSettings({ ...mapSettings, centerMarker: null });
+      setMapSettings({ ...mapSettings, centerMarkerLatLng: null });
       const bounds = new window.google.maps.LatLngBounds();
       for (let i = 0; i < places.length; i++) {
         if (places[i].geometry.viewport) {
