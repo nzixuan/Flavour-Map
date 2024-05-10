@@ -39,7 +39,7 @@ const CardContainer = ({
           className="card-container"
         >
           <InfiniteScroll
-            dataLength={displayedPlaces?.length}
+            dataLength={displayedPlaces ? displayedPlaces.length : 0}
             next={fetchMoreData}
             height={"90vh"}
             hasMore={!placesLoading && displayedPlaces?.length < places?.length}

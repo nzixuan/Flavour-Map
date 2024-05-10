@@ -27,7 +27,7 @@ function App() {
     foodType: "restaurant",
   });
   const [placesLoading, setPlacesLoading] = useState(false);
-  const [displayedPlaces, setDisplayedPlaces] = useState([]);
+  const [displayedPlaces, setDisplayedPlaces] = useState(null);
 
   const placeScore = (place) => {
     return place && place.rating && place.user_ratings_total
@@ -41,8 +41,8 @@ function App() {
     const placesService = new window.google.maps.places.PlacesService(map);
     if (mapSettings.centerMarkerLatLng !== null) {
       setPlacesLoading(true);
-      setPlaces([]);
-      setDisplayedPlaces([]);
+      setPlaces(null);
+      setDisplayedPlaces(null);
       console.log(mapSettings.centerMarkerLatLng);
       placesService.nearbySearch(
         {
@@ -103,9 +103,9 @@ function App() {
           setPlaces={setPlaces}
         ></LocationSearchBox>
         <Slider
-          min={1000}
-          max={8000}
-          step={1000}
+          min={100}
+          max={20000}
+          step={100}
           value={mapSettings.radius}
           onChange={(value) => {
             setMapSettings({ ...mapSettings, radius: value });
