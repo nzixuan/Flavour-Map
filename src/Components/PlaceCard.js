@@ -1,7 +1,6 @@
 import "./PlaceCard.css";
 import React from "react";
-import { Image, Card, Row, Col } from "antd";
-import { EllipsisOutlined } from "@ant-design/icons";
+import { Card, Row, Col } from "antd";
 import ImageCollage from "./ImageCollage";
 const { Meta } = Card;
 function convertPriceLevel(priceLevel) {

@@ -15,7 +15,7 @@ const CardContainer = ({
   useEffect(() => {
     if (placesLoading === false)
       setDisplayedPlaces(places?.slice(0, NUM_CARD_DISPLAYED));
-  }, [places, placesLoading]);
+  }, [places, placesLoading, setDisplayedPlaces]);
 
   const fetchMoreData = () => {
     console.log("Fetching more data");

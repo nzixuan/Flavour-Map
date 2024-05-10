@@ -1,6 +1,6 @@
 import React from "react";
-import { Dropdown, Menu } from "antd";
-// import "../../node_modules/antd/dist/antd.css";
+import { Dropdown, Button, Space } from "antd";
+import { AiFillCaretDown } from "react-icons/ai";
 
 function MenuDropdown({ mapSettings, setMapSettings }) {
   const options = [
@@ -37,21 +37,26 @@ function MenuDropdown({ mapSettings, setMapSettings }) {
       });
     }
   };
+  const items = options.map((option) => {
+    return { key: option, label: <>{option}</> };
+  });
 
-  const menu = (
-    <Menu onClick={handleMenuClick}>
-      {options.map((option) => (
-        <Menu.Item key={option}>{option}</Menu.Item>
-      ))}
-    </Menu>
-  );
+  const menuProps = {
+    items,
+    onClick: handleMenuClick,
+    selectable: true,
+    defaultSelectedKeys: ["restaurant"],
+  };
 
   return (
-    <div style={{ margin: "20px" }}>
-      <Dropdown overlay={menu} placement="bottomLeft">
-        <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
-          FoodTypes <i className="fa fa-caret-down"></i>
-        </a>
+    <div style={{ margin: "0 20px", width: "100%" }}>
+      <Dropdown menu={menuProps} placement="bottomLeft">
+        <Button>
+          <Space>
+            {mapSettings.foodType ? mapSettings.foodType : "Food Type"}
+            <AiFillCaretDown />
+          </Space>
+        </Button>
       </Dropdown>
     </div>
   );
