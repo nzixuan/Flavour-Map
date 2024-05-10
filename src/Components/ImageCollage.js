@@ -53,7 +53,7 @@ const ImageCollage = ({ map, place, savedPlaces, setSavedPlaces }) => {
       }
       setImages([{ src: "./placeholder.png" }]);
     }
-  }, [place, map]);
+  }, [place, map, setSavedPlaces, savedPlaces, images]);
   return images && images.length > 0 ? (
     <div
       style={{

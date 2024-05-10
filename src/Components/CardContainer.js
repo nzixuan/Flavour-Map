@@ -15,7 +15,7 @@ const CardContainer = ({
   useEffect(() => {
     if (placesLoading === false)
       setDisplayedPlaces(places?.slice(0, NUM_CARD_DISPLAYED));
-  }, [places, placesLoading]);
+  }, [places, placesLoading, setDisplayedPlaces]);
 
   const fetchMoreData = () => {
     console.log("Fetching more data");
@@ -39,7 +39,7 @@ const CardContainer = ({
           className="card-container"
         >
           <InfiniteScroll
-            dataLength={displayedPlaces?.length}
+            dataLength={displayedPlaces ? displayedPlaces.length : 0}
             next={fetchMoreData}
             height={"90vh"}
             hasMore={!placesLoading && displayedPlaces?.length < places?.length}

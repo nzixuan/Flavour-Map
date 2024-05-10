@@ -35,9 +35,12 @@ function Map({
     };
     handleResize();
     window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+
+    //Causing Destroy error
+
+    // return () => {
+    //   window.removeEventListener("resize", handleResize);
+    // };
   }, []);
 
   const onLoad = React.useCallback(
