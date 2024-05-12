@@ -17,7 +17,9 @@ const ImageCollage = ({ map, place, savedPlaces, setSavedPlaces }) => {
           (savedPlace) => savedPlace.place_id === place?.place_id
         );
         if (matchingPlace) {
-          return matchingPlace.savedPhotos;
+          console.log("Getting old photo");
+
+          setImages(matchingPlace.savedPhotos);
         } else {
           console.log("Getting new photo");
 
@@ -50,10 +52,11 @@ const ImageCollage = ({ map, place, savedPlaces, setSavedPlaces }) => {
             }
           );
         }
+      } else {
+        setImages([{ src: "./placeholder.png" }]);
       }
-      setImages([{ src: "./placeholder.png" }]);
     }
-  }, [place, map, setSavedPlaces, savedPlaces, images]);
+  }, []);
   return images && images.length > 0 ? (
     <div
       style={{
