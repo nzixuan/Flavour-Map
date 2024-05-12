@@ -46,6 +46,23 @@ function App() {
       ? place.rating * Math.log(place.user_ratings_total + 1)
       : 0;
   };
+
+  const fitBoundsToRadius = (map, radius, center) => {
+    // Convert the radius from meters to degrees
+    const radiusInDegrees = radius / 111300; // Approximately 111,300 meters in one degree (latitude or longitude)
+
+    // Calculate the bounds
+    const bounds = {
+      north: center.lat + radiusInDegrees,
+      south: center.lat - radiusInDegrees,
+      east: center.lng + radiusInDegrees,
+      west: center.lng - radiusInDegrees,
+    };
+
+    // Fit the map bounds to the calculated bounds
+    map.fitBounds(bounds);
+  };
+
   const search = () => {
     if (map === null) {
       return;
@@ -55,6 +72,11 @@ function App() {
       setPlacesLoading(true);
       setPlaces(null);
       setDisplayedPlaces(null);
+      fitBoundsToRadius(
+        map,
+        mapSettings.radius,
+        mapSettings.centerMarkerLatLng
+      );
       // console.log(mapSettings.centerMarkerLatLng);
       placesService.nearbySearch(
         {
@@ -170,6 +192,7 @@ function App() {
             setDisplayedPlaces={setDisplayedPlaces}
             selectedPlace={selectedPlace}
             setSelectedPlace={setSelectedPlace}
+            fitBoundsToRadius={fitBoundsToRadius}
           ></Map>
         </Flex>
         {/* </div> */}

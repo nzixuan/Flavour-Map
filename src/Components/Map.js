@@ -18,6 +18,7 @@ function Map({
   setDisplayedPlaces,
   selectedPlace,
   setSelectedPlace,
+  fitBoundsToRadius,
 }) {
   const [mapContainerStyle, setMapContainerStyle] = useState({
     width: "80vw",
@@ -66,7 +67,7 @@ function Map({
     [setMap]
   );
 
-  const panToLocation = () => {
+  const panToCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -77,6 +78,9 @@ function Map({
           setPlaces(null);
           setDisplayedPlaces(null);
           map.setCenter(pos);
+
+          fitBoundsToRadius(map, mapSettings.radius, pos);
+
           setMapSettings({
             ...mapSettings,
             centerMarkerLatLng: pos,
@@ -187,7 +191,7 @@ function Map({
       <button
         id="custom-location-control"
         className={map ? "visible-button" : "hidden"}
-        onClick={panToLocation}
+        onClick={panToCurrentLocation}
       >
         <FaLocationCrosshairs className="location-icon" />
       </button>
