@@ -2,7 +2,16 @@ import "./App.css";
 import "antd/dist/reset.css";
 
 import { Content, Footer, Header } from "antd/es/layout/layout";
-import { Flex, Layout, Slider, Button, Row, Col, Typography } from "antd";
+import {
+  Flex,
+  Layout,
+  Slider,
+  Button,
+  Row,
+  Col,
+  Typography,
+  InputNumber,
+} from "antd";
 import { GOOGLE_MAPS_LIBRARIES } from "./constants";
 import LocationSearchBox from "./Components/LocationSearchBox";
 import Map from "./Components/Map";
@@ -26,7 +35,7 @@ function App() {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [mapSettings, setMapSettings] = useState({
     centerMarkerLatLng: null,
-    radius: 1000,
+    radius: 100,
     foodType: "restaurant",
   });
   const [placesLoading, setPlacesLoading] = useState(false);
@@ -114,15 +123,25 @@ function App() {
             />
           </Col>
           <Col xs={13} md={4}>
-            <Row>
+            <Row align={"middle"} justify={"center"}>
               <Text
                 style={{ color: "white", fontWeight: "bold", fontSize: 12 }}
               >
                 Radius (m)
               </Text>
-              <Slider
+              <InputNumber
                 min={100}
                 max={20000}
+                style={{ margin: "0 16px" }}
+                value={mapSettings.radius}
+                onChange={(value) => {
+                  setMapSettings({ ...mapSettings, radius: value });
+                }}
+              />
+
+              <Slider
+                min={100}
+                max={5000}
                 step={100}
                 value={mapSettings.radius}
                 onChange={(value) => {
