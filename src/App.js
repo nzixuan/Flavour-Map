@@ -166,7 +166,7 @@ function App() {
               </Text>
               <InputNumber
                 min={100}
-                max={20000}
+                max={50000}
                 style={{ margin: "2px 16px", width: "8ch" }}
                 value={mapSettings.radius}
                 onChange={(value) => {
