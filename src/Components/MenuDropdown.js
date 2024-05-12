@@ -4,10 +4,12 @@ import { AiFillCaretDown } from "react-icons/ai";
 
 function MenuDropdown({ mapSettings, setMapSettings }) {
   const options = [
-    "bakery",
-    "bar",
-    "cafe",
+    "none",
     "restaurant",
+    "cafe",
+    "bar",
+    "bakery",
+    "store",
     "tourist_attraction",
     "lodging",
     "gym",
@@ -28,6 +30,11 @@ function MenuDropdown({ mapSettings, setMapSettings }) {
     "spa",
   ];
 
+  const convertTypeToString = (type) => {
+    type = type.replace(/_/g, " ");
+    type = type.charAt(0).toUpperCase() + type.slice(1);
+    return type;
+  };
   const handleMenuClick = (e) => {
     const selectedOption = options.find((option) => option === e.key);
     if (selectedOption) {
@@ -38,7 +45,7 @@ function MenuDropdown({ mapSettings, setMapSettings }) {
     }
   };
   const items = options.map((option) => {
-    return { key: option, label: <>{option}</> };
+    return { key: option, label: <>{convertTypeToString(option)}</> };
   });
 
   const menuProps = {
@@ -53,7 +60,9 @@ function MenuDropdown({ mapSettings, setMapSettings }) {
       <Dropdown menu={menuProps} placement="bottomLeft">
         <Button>
           <Space>
-            {mapSettings.foodType ? mapSettings.foodType : "Food Type"}
+            {mapSettings.foodType
+              ? convertTypeToString(mapSettings.foodType)
+              : "Food Type"}
             <AiFillCaretDown />
           </Space>
         </Button>
