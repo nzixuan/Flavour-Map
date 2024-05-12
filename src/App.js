@@ -11,6 +11,7 @@ import { useJsApiLoader } from "@react-google-maps/api";
 import { useState } from "react";
 import CardContainer from "./Components/CardContainer";
 import MenuDropdown from "./Components/MenuDropdown";
+
 function App() {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -33,7 +34,7 @@ function App() {
 
   const placeScore = (place) => {
     return place && place.rating && place.user_ratings_total
-      ? (place.rating * Math.log(place.user_ratings_total + 1)) / Math.log(6)
+      ? place.rating * Math.log(place.user_ratings_total + 1)
       : 0;
   };
   const search = () => {
