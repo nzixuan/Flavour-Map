@@ -13,15 +13,16 @@ const CardContainer = ({
   const [savedPlaces, setSavedPlaces] = useState([]);
 
   useEffect(() => {
-    if (placesLoading === false)
+    if (placesLoading === false && places)
       setDisplayedPlaces(places?.slice(0, NUM_CARD_DISPLAYED));
   }, [places, placesLoading, setDisplayedPlaces]);
 
   const fetchMoreData = () => {
     console.log("Fetching more data");
     setTimeout(() => {
+      //TODO: prev not iterable
       setDisplayedPlaces((prev) => [
-        ...prev,
+        ...(prev || []),
         ...places?.slice(
           prev.length,
           Math.min(prev.length + NUM_CARD_DISPLAYED, places?.length)

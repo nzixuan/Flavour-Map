@@ -14,6 +14,8 @@ function Map({
   setMapSettings,
   mapSettings,
   places,
+  setPlaces,
+  setDisplayedPlaces,
   selectedPlace,
   setSelectedPlace,
 }) {
@@ -72,6 +74,8 @@ function Map({
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           };
+          setPlaces(null);
+          setDisplayedPlaces(null);
           map.setCenter(pos);
           setMapSettings({
             ...mapSettings,

@@ -147,6 +147,8 @@ function App() {
             mapSettings={mapSettings}
             setMapSettings={setMapSettings}
             places={displayedPlaces}
+            setPlaces={setPlaces}
+            setDisplayedPlaces={setDisplayedPlaces}
             selectedPlace={selectedPlace}
             setSelectedPlace={setSelectedPlace}
           ></Map>
