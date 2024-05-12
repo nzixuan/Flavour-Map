@@ -1,5 +1,5 @@
 import React from "react";
-import { Dropdown, Button, Space } from "antd";
+import { Dropdown, Button, Space, Row } from "antd";
 import { AiFillCaretDown } from "react-icons/ai";
 
 function MenuDropdown({ mapSettings, setMapSettings }) {
@@ -8,26 +8,27 @@ function MenuDropdown({ mapSettings, setMapSettings }) {
     "restaurant",
     "cafe",
     "bar",
-    "bakery",
     "store",
     "tourist_attraction",
     "lodging",
     "gym",
-    "atm",
-    "convenience_store",
-    "supermarket",
-    "amusement_park",
-    "aquarium",
-    "book_store",
-    "campground",
-    "clothing_store",
-    "department_store",
-    "liquor_store",
-    "museum",
     "night_club",
-    "park",
     "shopping_mall",
     "spa",
+    "museum",
+
+    // "supermarket",
+    // "atm",
+    // "convenience_store",
+    // "park",
+    // "aquarium",
+    // "amusement_park",
+    // "bakery",
+    // "book_store",
+    // "campground",
+    // "clothing_store",
+    // "department_store",
+    // "liquor_store",
   ];
 
   const convertTypeToString = (type) => {
@@ -56,15 +57,15 @@ function MenuDropdown({ mapSettings, setMapSettings }) {
   };
 
   return (
-    <div style={{ margin: "0 20px", width: "100%" }}>
+    <div style={{ padding: "0 10px", width: "100%" }}>
       <Dropdown menu={menuProps} placement="bottomLeft">
-        <Button>
-          <Space>
+        <Button style={{ width: "100%" }}>
+          <Row justify={"space-between"} align={"middle"} wrap={false}>
             {mapSettings.foodType
               ? convertTypeToString(mapSettings.foodType)
               : "Food Type"}
             <AiFillCaretDown />
-          </Space>
+          </Row>
         </Button>
       </Dropdown>
     </div>

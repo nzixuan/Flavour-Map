@@ -10,6 +10,7 @@ import {
   Row,
   Col,
   Typography,
+  Input,
   InputNumber,
 } from "antd";
 import { GOOGLE_MAPS_LIBRARIES } from "./constants";
@@ -19,6 +20,7 @@ import React from "react";
 import { useJsApiLoader } from "@react-google-maps/api";
 import { useState } from "react";
 import CardContainer from "./Components/CardContainer";
+import { FaSearch } from "react-icons/fa";
 import MenuDropdown from "./Components/MenuDropdown";
 
 function App() {
@@ -37,6 +39,7 @@ function App() {
     centerMarkerLatLng: null,
     radius: 100,
     foodType: "restaurant",
+    keyword: "",
   });
   const [placesLoading, setPlacesLoading] = useState(false);
   const [displayedPlaces, setDisplayedPlaces] = useState(null);
@@ -81,7 +84,7 @@ function App() {
       placesService.nearbySearch(
         {
           rankBy: window.google.maps.places.RankBy.PROMINENCE,
-          // keyword: "food",
+          keyword: mapSettings.keyword,
           type: mapSettings.foodType,
           location: mapSettings.centerMarkerLatLng,
           radius: mapSettings.radius,
@@ -118,16 +121,16 @@ function App() {
       );
     }
   };
-  // console.log(mapSettings.radius);
+
   return isLoaded ? (
     <Layout style={{ minHeight: "100vh" }}>
       <Header
         style={{
           height: "auto",
-          padding: "0 20px",
+          padding: "0 10px",
         }}
       >
-        <Row justify="space-between" align={"middle"}>
+        <Row justify="start" align={"middle"}>
           <Col xs={13} md={8}>
             <LocationSearchBox
               searchBox={searchBox}
@@ -144,7 +147,17 @@ function App() {
               setMapSettings={setMapSettings}
             />
           </Col>
-          <Col xs={13} md={4}>
+          <Col xs={10} md={4}>
+            <Input
+              value={mapSettings.keyword}
+              onChange={(e) => {
+                setMapSettings({ ...mapSettings, keyword: e.target.value });
+              }}
+              placeholder="Keyword for search..."
+            ></Input>
+          </Col>
+
+          <Col xs={12} md={4}>
             <Row align={"middle"} justify={"center"}>
               <Text
                 style={{ color: "white", fontWeight: "bold", fontSize: 12 }}
@@ -154,13 +167,12 @@ function App() {
               <InputNumber
                 min={100}
                 max={20000}
-                style={{ margin: "0 16px" }}
+                style={{ margin: "2px 16px", width: "8ch" }}
                 value={mapSettings.radius}
                 onChange={(value) => {
                   setMapSettings({ ...mapSettings, radius: value });
                 }}
               />
-
               <Slider
                 min={100}
                 max={5000}
@@ -169,18 +181,16 @@ function App() {
                 onChange={(value) => {
                   setMapSettings({ ...mapSettings, radius: value });
                 }}
-                style={{ width: "100%", margin: "0 20px" }}
+                style={{ width: "100%", margin: "2px 20px" }}
               ></Slider>
             </Row>
           </Col>
-
-          <Col xs={6} md={2}>
-            <Button onClick={search}>Search</Button>
+          <Col xs={2} md={2}>
+            <Button onClick={search} icon={<FaSearch />}></Button>
           </Col>
         </Row>
       </Header>
       <Content style={{ overflow: "auto" }}>
-        {/* <div style={{ position: "sticky", top: "0", zIndex: 100 }}> */}
         <Flex justify="center">
           <Map
             map={map}
@@ -195,7 +205,6 @@ function App() {
             fitBoundsToRadius={fitBoundsToRadius}
           ></Map>
         </Flex>
-        {/* </div> */}
         <CardContainer
           map={map}
           places={places}
