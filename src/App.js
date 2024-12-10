@@ -23,6 +23,47 @@ import CardContainer from "./Components/CardContainer";
 import { FaSearch } from "react-icons/fa";
 import MenuDropdown from "./Components/MenuDropdown";
 
+const marks = {
+  0: {
+    style: {
+      color: "white",
+      fontWeight: "bold",
+    },
+    label: "",
+  },
+  1: {
+    style: {
+      color: "white",
+      fontWeight: "bold",
+
+    },
+    label: "$",
+  },
+  2: {
+    style: {
+      color: "white",
+      fontWeight: "bold",
+
+    },
+    label: "$$",
+  },
+  3: {
+    style: {
+      color: "white",
+      fontWeight: "bold",
+
+    },
+    label: "$$$",
+  },
+  4: {
+    style: {
+      color: "white",
+      fontWeight: "bold",
+    },
+    label: "$$$$",
+  },
+};
+
 function App() {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -37,9 +78,10 @@ function App() {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [mapSettings, setMapSettings] = useState({
     centerMarkerLatLng: null,
-    radius: 1000,
-    foodType: "restaurant",
-    keyword: "",
+    radius: 200,
+    foodType: "none",
+    keyword: "Food",
+    priceRange: [0, 2],
   });
   const [placesLoading, setPlacesLoading] = useState(false);
   const [displayedPlaces, setDisplayedPlaces] = useState(null);
@@ -80,12 +122,15 @@ function App() {
         mapSettings.radius,
         mapSettings.centerMarkerLatLng
       );
-      // console.log(mapSettings.centerMarkerLatLng);
+
+      // console.log(mapSettings);
       placesService.nearbySearch(
         {
           rankBy: window.google.maps.places.RankBy.PROMINENCE,
           keyword: mapSettings.keyword,
-          type: mapSettings.foodType,
+          type: mapSettings.foodType === "none" ? null : mapSettings.foodType,
+          minPriceLevel: mapSettings.priceRange[0],
+          maxPriceLevel: mapSettings.priceRange[1],
           location: mapSettings.centerMarkerLatLng,
           radius: mapSettings.radius,
           key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
@@ -130,7 +175,7 @@ function App() {
           padding: "0 10px",
         }}
       >
-        <Row justify="start" align={"middle"}>
+        <Row justify="start" align={"middle"} gutter={[16,0]}>
           <Col xs={13} md={8}>
             <LocationSearchBox
               searchBox={searchBox}
@@ -141,13 +186,7 @@ function App() {
               setPlaces={setPlaces}
             ></LocationSearchBox>
           </Col>
-          <Col xs={11} md={4}>
-            <MenuDropdown
-              mapSettings={mapSettings}
-              setMapSettings={setMapSettings}
-            />
-          </Col>
-          <Col xs={10} md={4}>
+          <Col xs={10} md={3}>
             <Input
               value={mapSettings.keyword}
               onChange={(e) => {
@@ -156,8 +195,7 @@ function App() {
               placeholder="Keyword for search..."
             ></Input>
           </Col>
-
-          <Col xs={12} md={4}>
+          <Col xs={14} md={4}>
             <Row align={"middle"} justify={"center"}>
               <Text
                 style={{ color: "white", fontWeight: "bold", fontSize: 12 }}
@@ -174,21 +212,57 @@ function App() {
                 }}
               />
               <Slider
-                min={100}
+                min={200}
                 max={5000}
-                step={100}
+                step={200}
                 value={mapSettings.radius}
                 onChange={(value) => {
                   setMapSettings({ ...mapSettings, radius: value });
                 }}
                 style={{ width: "100%", margin: "2px 20px" }}
               ></Slider>
+              <div style={{height: '10px'}}></div>
+
             </Row>
           </Col>
+          <Col xs={10} md={3}>
+            <MenuDropdown
+              mapSettings={mapSettings}
+              setMapSettings={setMapSettings}
+            />
+          </Col>
+          <Col xs={14} md={4} >
+            <Row align={"middle"} justify={"center"}>
+              <Text
+                style={{ color: "white", fontWeight: "bold", fontSize: 12 }}
+              >
+                Price Level
+              </Text>
+              <Slider
+                marks={marks}
+                range
+                min={0}
+                max={4}
+                step={1}
+                value={mapSettings.priceRange}
+                tooltip={{
+                  open: false,
+                }}
+                onChange={(value) => {
+                  setMapSettings({ ...mapSettings, priceRange: value });
+                }}
+                style={{ width: "100%", margin: "2px 20px"}}
+              ></Slider>
+              <div style={{height: '20px'}}></div>
+            </Row>
+          </Col>
+
+          
           <Col xs={2} md={2}>
             <Button onClick={search} icon={<FaSearch />}></Button>
           </Col>
         </Row>
+
       </Header>
       <Content style={{ overflow: "auto" }}>
         <Flex justify="center">
