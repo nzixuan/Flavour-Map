@@ -39,7 +39,7 @@ function renderStars(rating) {
 }
 
 const PlaceCard = ({ map, place, savedPlaces, setSavedPlaces }) => {
-  console.log(place);
+  // console.log(place);
   return (
     <Card
       style={{ width: "100%", marginTop: "0.5rem", padding: "0.5rem" }}
@@ -65,12 +65,14 @@ const PlaceCard = ({ map, place, savedPlaces, setSavedPlaces }) => {
               })
               .join(", ")}
           </p>
+          {place.rating &&
           <Row align={"middle"}>
-            <p style={{ marginRight: "3px" }}>{place.rating.toFixed(1)}</p>
+            <p style={{ marginRight: "3px" }}>{place.rating?.toFixed(1)}</p>
             {renderStars(place.rating)}
             <p style={{ marginLeft: "3px" }}>
               {"(" + place.user_ratings_total + ")"}
             </p>
+
             {place.price_level && <BsDot style={{ marginLeft: "3px" }} />}
             {place.price_level && (
               <p style={{ marginLeft: "3px" }}>
@@ -78,6 +80,7 @@ const PlaceCard = ({ map, place, savedPlaces, setSavedPlaces }) => {
               </p>
             )}
           </Row>
+}
           <Row align={"middle"}>
             <p>{place.formatted_address || place.vicinity}</p>
             <a

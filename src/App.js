@@ -37,7 +37,7 @@ function App() {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [mapSettings, setMapSettings] = useState({
     centerMarkerLatLng: null,
-    radius: 100,
+    radius: 1000,
     foodType: "restaurant",
     keyword: "",
   });
