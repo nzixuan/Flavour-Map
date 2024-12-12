@@ -167,7 +167,6 @@ function App() {
 
         const { places } = await Place.searchNearby(request);
         response = places;
-        console.log(response);
         response = response.filter(
           (place) =>
             (!place.priceLevel && mapSettings.priceRange[0] === 0) ||
