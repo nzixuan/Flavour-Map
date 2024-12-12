@@ -12,6 +12,7 @@ import {
   Typography,
   Input,
   InputNumber,
+  Radio,
 } from "antd";
 import { GOOGLE_MAPS_LIBRARIES } from "./constants";
 import LocationSearchBox from "./Components/LocationSearchBox";
@@ -23,43 +24,31 @@ import CardContainer from "./Components/CardContainer";
 import { FaSearch } from "react-icons/fa";
 import MenuDropdown from "./Components/MenuDropdown";
 
+const price_style = {
+  color: "white",
+  fontWeight: "bold",
+  fontSize: 12,
+};
+
 const marks = {
   0: {
-    style: {
-      color: "white",
-      fontWeight: "bold",
-    },
-    label: "",
+    style: price_style,
+    label: "-",
   },
   1: {
-    style: {
-      color: "white",
-      fontWeight: "bold",
-
-    },
+    style: price_style,
     label: "$",
   },
   2: {
-    style: {
-      color: "white",
-      fontWeight: "bold",
-
-    },
+    style: price_style,
     label: "$$",
   },
   3: {
-    style: {
-      color: "white",
-      fontWeight: "bold",
-
-    },
+    style: price_style,
     label: "$$$",
   },
   4: {
-    style: {
-      color: "white",
-      fontWeight: "bold",
-    },
+    style: price_style,
     label: "$$$$",
   },
 };
@@ -70,18 +59,20 @@ function App() {
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries: GOOGLE_MAPS_LIBRARIES,
   });
-  const { Text, Link } = Typography;
+
+  const { Text } = Typography;
 
   const [map, setMap] = React.useState(null);
-  const [places, setPlaces] = React.useState([]);
+  const [placesState, setPlaces] = React.useState([]);
   const [searchBox, setSearchBox] = React.useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [mapSettings, setMapSettings] = useState({
-    centerMarkerLatLng: null,
-    radius: 200,
-    foodType: "none",
-    keyword: "Food",
+    centerMarkerLatLng: { lat: 1.352083, lng: 103.819836 },
+    radius: 400,
+    foodType: "restaurant",
+    keyword: "",
     priceRange: [0, 2],
+    textSearchSetting: "Bias",
   });
   const [placesLoading, setPlacesLoading] = useState(false);
   const [displayedPlaces, setDisplayedPlaces] = useState(null);
@@ -92,78 +83,179 @@ function App() {
       : 0;
   };
 
-  const fitBoundsToRadius = (map, radius, center) => {
+  const boundsFromRadius = (center, radius) => {
     // Convert the radius from meters to degrees
     const radiusInDegrees = radius / 111300; // Approximately 111,300 meters in one degree (latitude or longitude)
-
-    // Calculate the bounds
-    const bounds = {
+    return {
       north: center.lat + radiusInDegrees,
       south: center.lat - radiusInDegrees,
       east: center.lng + radiusInDegrees,
       west: center.lng - radiusInDegrees,
     };
-
-    // Fit the map bounds to the calculated bounds
-    map.fitBounds(bounds);
   };
 
-  const search = () => {
+  const fitBoundsToRadius = (map, radius, center) => {
+    // Fit the map bounds to the calculated bounds
+    map.fitBounds(boundsFromRadius(center, radius));
+  };
+
+  // Search Button handler
+  const search = async () => {
     if (map === null) {
       return;
     }
-    const placesService = new window.google.maps.places.PlacesService(map);
     if (mapSettings.centerMarkerLatLng !== null) {
       setPlacesLoading(true);
       setPlaces(null);
       setDisplayedPlaces(null);
-      fitBoundsToRadius(
-        map,
-        mapSettings.radius,
-        mapSettings.centerMarkerLatLng
-      );
 
-      // console.log(mapSettings);
-      placesService.nearbySearch(
-        {
-          rankBy: window.google.maps.places.RankBy.PROMINENCE,
-          keyword: mapSettings.keyword,
-          type: mapSettings.foodType === "none" ? null : mapSettings.foodType,
-          minPriceLevel: mapSettings.priceRange[0],
-          maxPriceLevel: mapSettings.priceRange[1],
-          location: mapSettings.centerMarkerLatLng,
-          radius: mapSettings.radius,
-          key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-        },
-        (results, status, pagination) => {
-          console.log("Nearby search API Called");
-          if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-            setPlaces((prevPlaces) => {
-              if (
-                pagination.hasNextPage &&
-                (!prevPlaces || prevPlaces.length < 10)
-              ) {
-                pagination.nextPage();
-              } else {
-                setPlacesLoading(false);
-              }
+      const {
+        Place,
+        SearchNearbyRankPreference,
+        SearchByTextRankPreference,
+        PriceLevel,
+      } = await window.google.maps.importLibrary("places");
 
-              const updatePlace = [...(prevPlaces || []), ...results]
-                .filter((place) => place.business_status === "OPERATIONAL")
-                .map((place) => {
-                  return {
-                    ...place,
-                    score: placeScore(place),
-                  };
-                });
-              updatePlace.sort((a, b) => b.score - a.score);
-              return updatePlace;
-            });
-          } else {
-            console.error(status);
-          }
+      const priceLevelToEnum = {
+        0: PriceLevel.FREE,
+        1: PriceLevel.INEXPENSIVE,
+        2: PriceLevel.MODERATE,
+        3: PriceLevel.EXPENSIVE,
+        4: PriceLevel.VERY_EXPENSIVE,
+      };
+
+      const enumToPriceLevel = {
+        [PriceLevel.FREE]: 0,
+        [PriceLevel.INEXPENSIVE]: 1,
+        [PriceLevel.MODERATE]: 2,
+        [PriceLevel.EXPENSIVE]: 3,
+        [PriceLevel.VERY_EXPENS]: 4,
+      };
+
+      const fields = [
+        "displayName",
+        "businessStatus",
+        "formattedAddress",
+        "priceLevel",
+        "rating",
+        "types",
+        "userRatingCount",
+        "id",
+        "types",
+        "location",
+      ];
+
+      // Nearby Search
+      let response;
+      if (mapSettings.keyword === "") {
+        const request = {
+          fields: fields,
+          locationRestriction: {
+            center: mapSettings.centerMarkerLatLng,
+            radius: mapSettings.radius,
+          },
+          includedTypes:
+            mapSettings.foodType === "none" ? null : [mapSettings.foodType],
+          rankPreference: SearchNearbyRankPreference.POPULARITY,
+          // Debug Options
+          // maxResultCount: 3,
+        };
+
+        if (mapSettings.foodType === "restaurant") {
+          request.excludedTypes = ["hotel"];
         }
-      );
+
+        const { places } = await Place.searchNearby(request);
+        response = places;
+        response = response.filter(
+          (place) =>
+            (!place.priceLevel && mapSettings.priceRange[0] === 0) ||
+            (enumToPriceLevel[place.priceLevel] >= mapSettings.priceRange[0] &&
+              enumToPriceLevel[place.priceLevel] <= mapSettings.priceRange[1])
+        );
+        fitBoundsToRadius(
+          map,
+          mapSettings.radius,
+          mapSettings.centerMarkerLatLng
+        );
+      } else {
+        //Text Search
+
+        let priceLevels = [];
+        for (
+          let i = mapSettings.priceRange[0];
+          i <= mapSettings.priceRange[1];
+          i++
+        ) {
+          if (i === 0) {
+            continue;
+          }
+          priceLevels.push(priceLevelToEnum[i]);
+        }
+
+        const request = {
+          fields: fields,
+          textQuery: mapSettings.keyword,
+          rankPreference: SearchByTextRankPreference.RELEVANCE,
+          includedType:
+            mapSettings.foodType === "none" ? null : mapSettings.foodType,
+          priceLevels: priceLevels,
+          useStrictTypeFiltering: true,
+          // Debug Options
+          // maxResultCount: 3,
+        };
+
+        if (mapSettings.textSearchSetting === "Bias") {
+          request.locationBias = {
+            center: mapSettings.centerMarkerLatLng,
+            radius: mapSettings.radius,
+          };
+        } else if (mapSettings.textSearchSetting === "Restrict") {
+          request.locationRestriction = boundsFromRadius(
+            mapSettings.centerMarkerLatLng,
+            mapSettings.radius
+          );
+        }
+        const { places } = await Place.searchByText(request);
+        response = places;
+        if (places.length > 0) {
+          const bounds = new window.google.maps.LatLngBounds();
+          for (let i = 0; i < places.length; i++) {
+            bounds.extend(places[i]?.location);
+          }
+          map.fitBounds(bounds);
+        }
+      }
+
+      let results = response.map((place) => {
+        return {
+          business_status: place.businessStatus,
+          formatted_address: place.formattedAddress,
+          name: place.displayName,
+          price_level: enumToPriceLevel[place.priceLevel],
+          rating: place.rating,
+          types: place.types,
+          user_ratings_total: place.userRatingCount,
+          place_id: place.id,
+          location: place.location,
+        };
+      });
+
+      results = results
+        .filter((place) => place.business_status === "OPERATIONAL")
+        .map((place) => {
+          return {
+            ...place,
+            score: placeScore(place),
+          };
+        });
+
+      setPlaces((prevPlaces) => {
+        setPlacesLoading(false);
+        const updatePlace = [...(prevPlaces || []), ...results];
+        updatePlace.sort((a, b) => b.score - a.score);
+        return updatePlace;
+      });
     }
   };
 
@@ -172,11 +264,13 @@ function App() {
       <Header
         style={{
           height: "auto",
-          padding: "0 10px",
+          padding: "10px 10px",
         }}
       >
-        <Row justify="start" align={"middle"} gutter={[16,0]}>
-          <Col xs={13} md={8}>
+        {/* Navigation Bar */}
+        <Row justify="start" align={"middle"} gutter={[16, 0]}>
+          {/* Location Search Box */}
+          <Col xs={13} md={6}>
             <LocationSearchBox
               searchBox={searchBox}
               setSearchBox={setSearchBox}
@@ -186,16 +280,8 @@ function App() {
               setPlaces={setPlaces}
             ></LocationSearchBox>
           </Col>
-          <Col xs={10} md={3}>
-            <Input
-              value={mapSettings.keyword}
-              onChange={(e) => {
-                setMapSettings({ ...mapSettings, keyword: e.target.value });
-              }}
-              placeholder="Keyword for search..."
-            ></Input>
-          </Col>
-          <Col xs={14} md={4}>
+          {/* Radius Slider */}
+          <Col xs={11} md={4}>
             <Row align={"middle"} justify={"center"}>
               <Text
                 style={{ color: "white", fontWeight: "bold", fontSize: 12 }}
@@ -213,25 +299,40 @@ function App() {
               />
               <Slider
                 min={200}
-                max={5000}
+                max={2000}
                 step={200}
+                tooltip={{
+                  open: false,
+                }}
                 value={mapSettings.radius}
                 onChange={(value) => {
                   setMapSettings({ ...mapSettings, radius: value });
                 }}
-                style={{ width: "100%", margin: "2px 20px" }}
+                style={{ width: "100%", margin: "2px 8px" }}
               ></Slider>
-              <div style={{height: '10px'}}></div>
-
+              <div style={{ height: "10px" }}></div>
             </Row>
           </Col>
+          {/* Type Filter Dropdown*/}
           <Col xs={10} md={3}>
             <MenuDropdown
               mapSettings={mapSettings}
               setMapSettings={setMapSettings}
             />
           </Col>
-          <Col xs={14} md={4} >
+          {/* Keyword Search */}
+          <Col xs={14} md={4}>
+            <Input
+              value={mapSettings.keyword}
+              onChange={(e) => {
+                setMapSettings({ ...mapSettings, keyword: e.target.value });
+              }}
+              placeholder="Keyword for search..."
+            ></Input>
+          </Col>
+
+          {/* Price Slider */}
+          <Col xs={11} md={3}>
             <Row align={"middle"} justify={"center"}>
               <Text
                 style={{ color: "white", fontWeight: "bold", fontSize: 12 }}
@@ -251,20 +352,40 @@ function App() {
                 onChange={(value) => {
                   setMapSettings({ ...mapSettings, priceRange: value });
                 }}
-                style={{ width: "100%", margin: "2px 20px"}}
+                style={{ width: "100%", margin: "2px 8px" }}
               ></Slider>
-              <div style={{height: '20px'}}></div>
+              <div style={{ height: "20px" }}></div>
             </Row>
           </Col>
-
-          
-          <Col xs={2} md={2}>
+          {/* Bias/Restrict Toggle */}
+          <Col xs={10} md={3}>
+            <Radio.Group
+              block
+              options={[
+                { label: "Bias", value: "Bias" },
+                { label: "Restrict", value: "Restrict" },
+              ]}
+              value={mapSettings.textSearchSetting}
+              onChange={(e) => {
+                setMapSettings({
+                  ...mapSettings,
+                  textSearchSetting: e.target.value,
+                });
+              }}
+              disabled={mapSettings.keyword === ""}
+              optionType="button"
+              buttonStyle="solid"
+            />
+          </Col>
+          {/* Search Button */}
+          <Col xs={2} md={1}>
             <Button onClick={search} icon={<FaSearch />}></Button>
           </Col>
         </Row>
-
       </Header>
+      {/* Main Content */}
       <Content style={{ overflow: "auto" }}>
+        {/* Map */}
         <Flex justify="center">
           <Map
             map={map}
@@ -279,9 +400,10 @@ function App() {
             fitBoundsToRadius={fitBoundsToRadius}
           ></Map>
         </Flex>
+        {/* Cards Container */}
         <CardContainer
           map={map}
-          places={places}
+          places={placesState}
           selectedPlace={selectedPlace}
           placesLoading={placesLoading}
           displayedPlaces={displayedPlaces}
