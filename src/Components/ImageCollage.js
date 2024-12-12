@@ -10,52 +10,44 @@ const ImageCollage = ({ map, place, savedPlaces, setSavedPlaces }) => {
   const [images, setImages] = useState([]);
   const [index, setIndex] = useState(-1);
 
-  useEffect(() => {
-    if (place && map && images.length === 0) {
-      if (place?.photos?.length > 0) {
-        const matchingPlace = savedPlaces?.find(
-          (savedPlace) => savedPlace.place_id === place?.place_id
-        );
-        if (matchingPlace) {
-          console.log("Getting old photo");
+  async function getPhotos() {
+    if (!(place && map)) return;
+    const matchingPlace = savedPlaces?.find(
+      (savedPlace) => savedPlace.place_id === place?.place_id
+    );
+    if (matchingPlace) {
+      console.log("Getting old photo");
+      setImages(matchingPlace.savedPhotos);
+    } else {
+      console.log("Getting new photo");
 
-          setImages(matchingPlace.savedPhotos);
-        } else {
-          console.log("Getting new photo");
-
-          const placesService = new window.google.maps.places.PlacesService(
-            map
-          );
-          placesService.getDetails(
-            {
-              placeId: place.place_id,
-              fields: ["photos"],
-            },
-            (p, status) => {
-              console.log("Photo API Called");
-              if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-                const images = p?.photos
-                  ?.slice(0, Math.min(3, p?.photos?.length))
-                  .map((photo) => {
-                    return {
-                      src: photo.getUrl(),
-                      width: photo.width,
-                      height: photo.height,
-                    };
-                  });
-                setSavedPlaces((prev) => [
-                  ...savedPlaces,
-                  { place_id: place.place_id, savedPhotos: images },
-                ]);
-                setImages(images);
-              }
-            }
-          );
-        }
+      const { Place } = await window.google.maps.importLibrary("places");
+      const p = new Place({
+        id: place.place_id,
+      });
+      await p?.fetchFields({ fields: ["photos"] });
+      if (p?.photos?.length > 0) {
+        const images = p?.photos
+          ?.slice(0, Math.min(3, p?.photos?.length))
+          .map((photo) => {
+            return {
+              src: photo.getURI(),
+              width: photo.widthPx,
+              height: photo.heightPx,
+            };
+          });
+        setSavedPlaces((prev) => [
+          ...savedPlaces,
+          { place_id: place.place_id, savedPhotos: images },
+        ]);
+        setImages(images);
       } else {
         setImages([{ src: "./placeholder.png" }]);
       }
     }
+  }
+  useEffect(() => {
+    getPhotos();
   }, []);
   return images && images.length > 0 ? (
     <div

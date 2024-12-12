@@ -40,3 +40,8 @@
 .ant-slider-rail{
   background-color: rgba(255, 255, 255, 0.25) !important; 
 }
+
+.ant-radio-button-wrapper-disabled> span
+{
+  color: rgba(255, 255, 255, 0.75) !important;
+}

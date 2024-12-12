@@ -113,6 +113,7 @@ function Map({
           mapTypeControl: false,
           gestureHandling: "greedy",
         }}
+        onClick={(e) => {selectedPlace && setSelectedPlace(null)}}
       >
         {/* Center Marker */}
         {mapSettings.centerMarkerLatLng && (
@@ -167,7 +168,7 @@ function Map({
           places.map((place) => (
             <Marker
               key={place.place_id + "m"}
-              position={place.geometry.location}
+              position={place.location}
               onClick={(e) => {
                 setSelectedPlace(place);
               }}
@@ -177,10 +178,11 @@ function Map({
         {/* InfoWindow for Selected Place */}
         {selectedPlace && (
           <InfoWindow
-            position={selectedPlace.geometry.location}
+            position={selectedPlace.location}
             onCloseClick={() => {
               setSelectedPlace(null);
             }}
+            
           >
             <div>
               <h3>{selectedPlace.name}</h3>
